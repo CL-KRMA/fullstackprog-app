@@ -34,7 +34,7 @@ jobs:
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
-        
+
       - name: Run frontend tests
         run: |
           docker run --rm ghcr.io/${{ secrets.GHCR_USERNAME }}/fullstackprog-app:${{ github.sha }} npm test
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout infra repo
         uses: actions/checkout@v3
         with:
-          repository: CL-KRMA/cryptodash-gitops   # <-- ton repo infra
+          repository: CL-KRMA/fullstackprog-gitops   # <-- ton repo infra
           ref: main
           token: ${{ secrets.INFRA_REPO_TOKEN }}
 
