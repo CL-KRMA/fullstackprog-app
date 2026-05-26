@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "next start -H 0.0.0.0 -p 3000",
+    "lint": "eslint",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
