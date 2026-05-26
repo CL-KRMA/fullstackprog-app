@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # 1. Build & Push
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./fullstack
+          push: true
+          tags: |
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/fullstackprog-app:${{ github.sha }}
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/fullstackprog-app:latest
+
+  # 2. Tests
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run frontend tests
+        run: |
+          docker run --rm ghcr.io/${{ secrets.GHCR_USERNAME }}/fullstackprog-app:${{ github.sha }} npm test
+
+  # 3. Mise à jour du repo infra
+  update-infra:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout infra repo
+        uses: actions/checkout@v3
+        with:
+          repository: CL-KRMA/cryptodash-gitops   # <-- ton repo infra
+          ref: main
+          token: ${{ secrets.INFRA_REPO_TOKEN }}
+
+      - name: Mettre à jour le manifest avec le nouveau tag
+        run: |
+          sed -i "s|ghcr.io.*/fullstackprog-app:.*|ghcr.io/${{ secrets.GHCR_USERNAME }}/fullstackprog-app:${{ github.sha }}|g" frontend.yaml
+
+      - name: Commit et push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add frontend.yaml
+          git commit -m "Update fullstackprog-app image to ${{ github.sha }}" || echo "No changes to commit"
+          git push origin main

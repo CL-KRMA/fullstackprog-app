@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  # Application Next.js - Galerie en ligne
+  fullstack:
+    build:
+      context: ./fullstack
+      dockerfile: Dockerfile
+    container_name: nextjs_app
+    restart: always
+    ports:
+      - "3000:3000"  # Accès depuis http://localhost:3000
+    environment:
+      DB_HOST: db
+      DB_USER: gallery_user
+      DB_PASSWORD: pass
+      DB_NAME: gallery_db
+      JWT_SECRET: your-secret-jwt-key-change-in-production
+      NODE_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fullstack-network
+    # Limite les ressources
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+  # Base de données MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: gallery_db
+      MYSQL_USER: gallery_user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./fullstack/database.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fullstack-network
+    # Pas exposé à l'hôte - sécurité
+
+  # PhpMyAdmin - Administration de la BD (optionnel)
+  phpmyadmin:
+    image: phpmyadmin:5.2-apache
+    container_name: phpmyadmin_app
+    restart: always
+    ports:
+      - "8080:80"  # Accès depuis http://localhost:8080
+    environment:
+      PMA_ABSOLUTE_URI: http://localhost:8080/
+    volumes:
+      - ./fullstack/phpmyadmin_config.php:/etc/phpmyadmin/config.user.inc.php
+    depends_on:
+      - db
+    networks:
+      - fullstack-network
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  fullstack-network:
+    driver: bridge
