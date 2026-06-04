@@ -11,10 +11,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+        working-directory: ./fullstack
       - name: Run ESLint
         run: npm run lint
+        working-directory: ./fullstack
 
   # 2. Tests unitaires hors conteneur
   tests:
@@ -22,10 +27,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+        working-directory: ./fullstack
       - name: Run Jest tests
         run: npm test
+        working-directory: ./fullstack
 
   # 3. Build & Push image (seulement si lint + tests passent)
   build:
