@@ -73,6 +73,13 @@ export async function POST(req: NextRequest) {
       [username, hashedPassword]
     )) as unknown as [ExecuteResult, DatabaseMetadata];
 
+    if (!result.insertId) {
+      return NextResponse.json(
+        { error: "Erreur lors de la création de l'utilisateur" },
+        { status: 500 }
+      );
+    }
+
     const insertedId = result.insertId;
 
     // Générer un JWT token
