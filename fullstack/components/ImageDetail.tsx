@@ -31,6 +31,7 @@ const ImageDetail: React.FC<ImageDetailProps> = ({ image, onUpdate, onDelete, on
   return (
     <div style={{ marginTop: "20px", padding: "15px", border: "1px solid #444" }}>
       <h2>{image.name}</h2>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={image.imageUrl}
         alt={image.name}

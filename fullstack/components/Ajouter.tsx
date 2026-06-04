@@ -110,6 +110,7 @@ const Ajouter: React.FC = () => {
 
       {formData.imageUrl && (
         <div style={{ marginTop: "10px" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={formData.imageUrl}
             alt="Aperçu"

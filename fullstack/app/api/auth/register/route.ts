@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/mysql";
 import { hashPassword, generateToken } from "@/lib/jwt";
 
+type DatabaseMetadata = Record<string, unknown>[];
+
+interface User {
+  id: number;
+  username: string;
+  password: string;
+  createdAt: string;
+}
+
+interface ExecuteResult {
+  insertId?: number;
+  affectedRows?: number;
+}
+
 export async function POST(req: NextRequest) {
   const connection = await pool.getConnection();
   try {
@@ -41,9 +55,9 @@ export async function POST(req: NextRequest) {
     const [existingUsers] = await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    );
+    ) as Promise<[User[], DatabaseMetadata]>;
     
-    if ((existingUsers as any[]).length > 0) {
+    if (existingUsers.length > 0) {
       return NextResponse.json(
         { error: "Cet username est déjà pris" },
         { status: 409 }
@@ -57,9 +71,9 @@ export async function POST(req: NextRequest) {
     const [result] = await connection.execute(
       "INSERT INTO users (username, password, createdAt) VALUES (?, ?, NOW())",
       [username, hashedPassword]
-    );
+    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
 
-    const insertedId = (result as any).insertId;
+    const insertedId = result.insertId;
 
     // Générer un JWT token
     const token = generateToken(insertedId.toString(), username);

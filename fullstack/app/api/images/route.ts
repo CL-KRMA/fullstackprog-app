@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/mysql";
 import { isAuthenticated, createUnauthorizedResponse } from "@/lib/auth";
 
+type DatabaseMetadata = Record<string, unknown>[];
+
+interface ExecuteResult {
+  insertId?: number;
+  affectedRows?: number;
+}
+
 export async function GET() {
   const connection = await pool.getConnection();
   try {
@@ -33,9 +40,9 @@ export async function POST(req: NextRequest) {
     const [result] = await connection.execute(
       "INSERT INTO images (name, description, imageUrl, createdAt) VALUES (?, ?, ?, NOW())",
       [name, description, imageUrl]
-    );
+    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
 
-    const insertedId = (result as any).insertId;
+    const insertedId = result.insertId;
 
     return NextResponse.json({ message: "Image ajoutée", id: insertedId });
   } catch (error) {

@@ -37,7 +37,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
         const data = await response.json();
         setError(data.error || "Erreur lors de l'inscription");
       }
-    } catch (err) {
+    } catch {
       setError("Erreur réseau");
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
 
   return (
     <div style={{ maxWidth: "300px", margin: "50px auto", padding: "20px" }}>
-      <h2>S'inscrire</h2>
+      <h2>S&apos;inscrire</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>

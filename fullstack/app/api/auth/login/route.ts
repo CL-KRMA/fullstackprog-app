@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/mysql";
 import { verifyPassword, generateToken } from "@/lib/jwt";
 
+type DatabaseMetadata = Record<string, unknown>[];
+
+interface User {
+  id: number;
+  username: string;
+  password: string;
+  createdAt: string;
+}
+
 export async function POST(req: NextRequest) {
   const connection = await pool.getConnection();
   try {
@@ -19,16 +28,16 @@ export async function POST(req: NextRequest) {
     const [users] = await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    );
+    ) as Promise<[User[], DatabaseMetadata]>;
 
-    if ((users as any[]).length === 0) {
+    if (users.length === 0) {
       return NextResponse.json(
         { error: "Utilisateur ou password invalide" },
         { status: 401 }
       );
     }
 
-    const user = (users as any[])[0];
+    const user = users[0];
 
     // Vérifier le password
     const passwordMatch = await verifyPassword(password, user.password);

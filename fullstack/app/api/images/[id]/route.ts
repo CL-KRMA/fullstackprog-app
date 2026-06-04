@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/mysql";
 import { isAuthenticated, createUnauthorizedResponse } from "@/lib/auth";
 
+type DatabaseMetadata = Record<string, unknown>[];
+
+interface ExecuteResult {
+  insertId?: number;
+  affectedRows?: number;
+}
+
 // 🔹 Modifier une image
 export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   // ✅ Vérifier l'authentification
@@ -18,9 +25,9 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     const [result] = await connection.execute(
       "UPDATE images SET name = ?, description = ?, imageUrl = ? WHERE id = ?",
       [name, description, imageUrl, id]
-    );
+    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
 
-    if ((result as any).affectedRows === 0) {
+    if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Image non trouvée" }, { status: 404 });
     }
 
@@ -47,9 +54,9 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     const [result] = await connection.execute(
       "DELETE FROM images WHERE id = ?",
       [id]
-    );
+    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
 
-    if ((result as any).affectedRows === 0) {
+    if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Image non trouvée" }, { status: 404 });
     }
 

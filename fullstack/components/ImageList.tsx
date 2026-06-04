@@ -31,7 +31,7 @@ const ImageList: React.FC = () => {
       body: JSON.stringify(editData),
     });
     if (response.ok) {
-      const updated = await response.json();
+      await response.json();
       setImages((prev) =>
         prev.map((img) => (img._id === id ? { ...img, ...editData } : img))
       );
@@ -89,6 +89,7 @@ const ImageList: React.FC = () => {
               onClick={() => setSelectedImage(img)}
             >
               <h3>{img.name}</h3>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.imageUrl}
                 alt={img.name}

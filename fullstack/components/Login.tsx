@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         const data = await response.json();
         setError(data.error || "Erreur de connexion");
       }
-    } catch (err) {
+    } catch {
       setError("Erreur réseau");
     } finally {
       setLoading(false);
@@ -114,7 +114,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <p style={{ fontSize: "14px" }}>
           Pas encore inscrit?{" "}
           <Link href="/register" style={{ color: "#0070f3" }}>
-            S'inscrire
+            S&apos;inscrire
           </Link>
         </p>
       </div>

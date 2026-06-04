@@ -11,23 +11,35 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    let isMounted = true;
 
-  const checkAuth = async () => {
-    try {
-      const response = await fetch("/api/auth/me");
-      if (response.ok) {
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (isMounted) {
+          if (response.ok) {
+            setAuthenticated(true);
+          } else {
+            setAuthenticated(false);
+          }
+        }
+      } catch {
+        if (isMounted) {
+          setAuthenticated(false);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      setAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   if (loading) {
     return <div style={{ textAlign: "center", padding: "20px"  }}>Chargement...</div>;

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       { authenticated: true, userId: decoded.userId, username: decoded.username },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 }
