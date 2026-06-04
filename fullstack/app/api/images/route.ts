@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const [result] = (await connection.execute(
       "INSERT INTO images (name, description, imageUrl, createdAt) VALUES (?, ?, ?, NOW())",
       [name, description, imageUrl]
-    )) as [ExecuteResult, DatabaseMetadata];
+    )) as unknown as [ExecuteResult, DatabaseMetadata];
 
     const insertedId = result.insertId;
 

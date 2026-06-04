@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const [users] = (await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    )) as [User[], DatabaseMetadata];
+    )) as unknown as [User[], DatabaseMetadata];
 
     if (users.length === 0) {
       return NextResponse.json(

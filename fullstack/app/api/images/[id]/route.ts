@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     const [result] = (await connection.execute(
       "UPDATE images SET name = ?, description = ?, imageUrl = ? WHERE id = ?",
       [name, description, imageUrl, id]
-    )) as [ExecuteResult, DatabaseMetadata];
+    )) as unknown as [ExecuteResult, DatabaseMetadata];
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Image non trouvée" }, { status: 404 });
@@ -54,7 +54,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     const [result] = (await connection.execute(
       "DELETE FROM images WHERE id = ?",
       [id]
-    )) as [ExecuteResult, DatabaseMetadata];
+    )) as unknown as [ExecuteResult, DatabaseMetadata];
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Image non trouvée" }, { status: 404 });

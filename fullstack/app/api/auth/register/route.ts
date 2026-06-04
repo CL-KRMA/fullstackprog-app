@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const [existingUsers] = (await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    )) as [User[], DatabaseMetadata];
+    )) as unknown as [User[], DatabaseMetadata];
     
     if (existingUsers.length > 0) {
       return NextResponse.json(
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const [result] = (await connection.execute(
       "INSERT INTO users (username, password, createdAt) VALUES (?, ?, NOW())",
       [username, hashedPassword]
-    )) as [ExecuteResult, DatabaseMetadata];
+    )) as unknown as [ExecuteResult, DatabaseMetadata];
 
     const insertedId = result.insertId;
 
