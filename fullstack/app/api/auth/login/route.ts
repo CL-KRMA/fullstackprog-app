@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Chercher l'utilisateur dans la base de données
-    const [users] = await connection.execute(
+    const [users] = (await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    ) as Promise<[User[], DatabaseMetadata]>;
+    )) as [User[], DatabaseMetadata];
 
     if (users.length === 0) {
       return NextResponse.json(

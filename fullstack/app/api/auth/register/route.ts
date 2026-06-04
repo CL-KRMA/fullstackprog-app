@@ -52,10 +52,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Vérifier si l'utilisateur existe déjà
-    const [existingUsers] = await connection.execute(
+    const [existingUsers] = (await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
-    ) as Promise<[User[], DatabaseMetadata]>;
+    )) as [User[], DatabaseMetadata];
     
     if (existingUsers.length > 0) {
       return NextResponse.json(
@@ -68,10 +68,10 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await hashPassword(password);
 
     // Créer l'utilisateur
-    const [result] = await connection.execute(
+    const [result] = (await connection.execute(
       "INSERT INTO users (username, password, createdAt) VALUES (?, ?, NOW())",
       [username, hashedPassword]
-    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
+    )) as [ExecuteResult, DatabaseMetadata];
 
     const insertedId = result.insertId;
 

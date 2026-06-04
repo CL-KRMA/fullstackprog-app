@@ -37,10 +37,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
     }
 
-    const [result] = await connection.execute(
+    const [result] = (await connection.execute(
       "INSERT INTO images (name, description, imageUrl, createdAt) VALUES (?, ?, ?, NOW())",
       [name, description, imageUrl]
-    ) as Promise<[ExecuteResult, DatabaseMetadata]>;
+    )) as [ExecuteResult, DatabaseMetadata];
 
     const insertedId = result.insertId;
 
